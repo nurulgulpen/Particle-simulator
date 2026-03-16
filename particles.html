@@ -41,6 +41,11 @@
 
     <canvas id="quantumCanvas"></canvas>
 
+    <!-- Hidden background audio - Sleep Has Her House Soundtrack -->
+    <audio id="backgroundAudio" loop preload="auto" style="display:none;">
+        <source src="./Sleep Has Her House (Original Motion Picture Soundtrack) [P8umwTHWlyc].mp3" type="audio/mpeg">
+    </audio>
+
     <script>
         /**
          * DYNAMICAL FIELD TOPOLOGY
@@ -54,7 +59,7 @@
         let angleX = 0.5, angleY = 0.4, scale = 1.0, time = 0;
         
         const BOX_SIZE = 1000;
-        const NUM_PARTICLES = 60000;
+        const NUM_PARTICLES = 100000;
         const SOURCES_COUNT = 5;
         const EPSILON = 500; 
 
@@ -191,6 +196,37 @@
             scale = Math.max(0.1, Math.min(5.0, scale - e.deltaY * 0.001));
             e.preventDefault();
         }, { passive: false });
+
+        // Handle audio autoplay
+        const audio = document.getElementById('backgroundAudio');
+        
+        // Log audio element state
+        console.log('Audio element:', audio);
+        console.log('Audio src:', audio.src);
+        
+        // Try to play on page load with muted state
+        const playAudio = () => {
+            console.log('Attempting to play audio...');
+            audio.volume = 0.5;
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        console.log('Audio playing successfully');
+                    })
+                    .catch(error => {
+                        console.error('Audio playback error:', error);
+                    });
+            }
+        };
+
+        // Play on first user interaction
+        document.addEventListener('click', playAudio, { once: true });
+        window.addEventListener('scroll', playAudio, { once: true });
+        document.addEventListener('keydown', playAudio, { once: true });
+        document.addEventListener('touchstart', playAudio, { once: true });
+
+        console.log(">> SYSTEM INITIALIZED");
 
         animate();
     </script>
