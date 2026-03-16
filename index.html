@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCHIZO :: ICEBERG :: THE DESCENT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1410;
+            font-family: 'Times New Roman', Georgia, serif;
+            color: #CC6633;
+            line-height: 1.5;
+            padding: 2rem 1rem;
+            overflow-x: hidden;
+            cursor: default;
+        }
+
+        html {
+            scroll-behavior: auto;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.08) 0px, transparent 1px);
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: overlay;
+            animation: scanlines 6s linear infinite;
+        }
+
+        @keyframes scanlines {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 20px; }
+        }
+
+        .iceberg-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 6px;
+            background: #FFCC00;
+            z-index: 99999;
+            box-shadow: 0 0 20px #FF3300;
+            transition: width 0.1s linear;
+        }
+
+        .essay {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #0a0806;
+            padding: 2rem 2.5rem;
+            box-shadow: 0 10px 30px rgba(255, 51, 0, 0.15);
+            border: 2px solid #8B4513;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: -0.5px;
+            border-bottom: 2px solid #8B4513;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            font-family: 'Times New Roman', serif;
+            text-transform: uppercase;
+            color: #FFCC00;
+            text-shadow: 2px 2px 0 #660000;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            border-left: 8px solid #8B4513;
+            padding-left: 1rem;
+            color: #FF3300;
+            text-shadow: 1px 1px 0 #660000;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin: 1.5rem 0 0.5rem;
+            font-weight: 600;
+            color: #FF6600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px dashed #996633;
+            padding-bottom: 0.2rem;
+        }
+
+        p {
+            margin: 1rem 0;
+            text-align: justify;
+            color: #CC6633;
+        }
+
+        ul, ol {
+            margin: 0.5rem 0 1rem 1.8rem;
+            color: #CC6633;
+        }
+
+        li {
+            margin-bottom: 0.25rem;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px dotted #996633;
+            margin: 2rem 0;
+        }
+
+        .study-resources {
+            background: rgba(153, 102, 51, 0.15);
+            padding: 0.8rem 1.2rem;
+            border-radius: 0;
+            border-left: 4px solid #8B4513;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+            color: #CC6633;
+        }
+
+        .study-resources strong {
+            color: #FF6600;
+            text-shadow: 1px 1px 0 #660000;
+        }
+
+        .conspiracy {
+            background: rgba(200, 100, 50, 0.1);
+            border-left: 4px solid #CC3300;
+            padding: 0.5rem 1rem;
+            margin: 1rem 0;
+            color: #FF3300;
+        }
+
+        .counter {
+            background: rgba(100, 150, 120, 0.1);
+            border-left: 4px solid #669955;
+            padding: 0.5rem 1rem;
+            margin: 1rem 0;
+            color: #88BB66;
+        }
+
+        .baseline {
+            border-left: 4px solid #8B7355;
+            padding: 0.5rem 1rem;
+            background: rgba(100, 70, 50, 0.1);
+            margin: 1rem 0;
+            color: #CC6633;
+        }
+
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            color: #996633;
+            font-size: 0.85rem;
+            border-top: 1px solid #8B4513;
+            padding-top: 1.5rem;
+        }
+
+        a {
+            color: #FF6600;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        a:hover {
+            color: #FFCC00;
+            text-shadow: 0 0 5px #FF3300;
+        }
+
+        .occult-gif {
+            width: 100%;
+            max-height: 420px;
+            image-rendering: pixelated;
+            border: 3px solid #FF3300;
+            margin: 2rem 0;
+        }
+
+        canvas {
+            display: block;
+            margin: 2rem auto;
+            border: 2px solid #8B4513;
+            background: #000;
+            max-width: 100%;
+        }
+
+        button {
+            background: #1a1410;
+            color: #FFCC00;
+            border: 2px solid #8B4513;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 3px 3px 0 #660000;
+            transition: 0.1s;
+            font-family: 'Times New Roman', serif;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #330000;
+            color: #FFCC00;
+            box-shadow: -3px -3px 0 #996633;
+        }
+
+        .scroll-anomaly {
+            background: rgba(255, 51, 0, 0.1);
+            outline: 2px solid #FF3300;
+        }
+
+        table {
+            margin: 2rem auto;
+            border-collapse: collapse;
+            border: 2px solid #8B4513;
+            background: #0a0806;
+            width: 100%;
+        }
+
+        td, th {
+            padding: 12px;
+            border: 1px solid #8B4513;
+            text-align: left;
+            font-size: 0.9rem;
+            color: #CC6633;
+        }
+
+        th {
+            background: #330000;
+            color: #FFCC00;
+            font-weight: bold;
+        }
+
+        .floating-names {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem 2rem;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.5);
+            padding: 1.5rem;
+            border: 2px solid #8B4513;
+            color: #FFCC00;
+            margin: 2rem 0;
+        }
+
+        .floating-names span {
+            color: #FFCC00;
+            text-shadow: 1px 1px 0 #660000;
+        }
+    </style>
+</head>
+<body bgcolor="#000000" text="#FF3300">
+
+<!-- Hidden background audio - Dark Atmospheric Music -->
+<audio id="backgroundAudio" loop style="display:none;">
+    <source src="./output.mp3" type="audio/mpeg">
+</audio>
+
+<div class="iceberg-progress" id="progressBar"></div>
+
+<div class="essay">
+    <h1>THE ICEBERG: LAYERS OF POWER & MYTH</h1>
+    <p style="font-size: 1.2rem; text-align: center; color: #FFCC00;">— an essay on the new elite, occult undertow, and the narratives that shape our time —</p>
+
+    <!-- 1. Jeffrey Epstein -->
+    <h2>1. Jeffrey Epstein</h2>
+
+    <div class="baseline">
+        <h3>Baseline facts</h3>
+        <p>Epstein was a convicted sex offender (2008 plea, 2019 death ruled suicide) who ran a trafficking network. Unsealed court docs (Giuffre v. Maxwell, 2015–2024 releases) name associates via flight logs, black book, emails: Bill Clinton, Donald Trump, Bill Gates, Prince Andrew and others. No public "client list" proving systematic blackmail; FBI found no master list. Epstein's wealth source remains murky (possible intelligence ties alleged but unproven).</p>
+    </div>
+
+    <div class="conspiracy">
+        <h3>Conspiracy layer</h3>
+        <p>"New elite" (Gates, Kushner-adjacent networks, Trump orbit) used Epstein for kompromat to control old power (Clintons). Island/temple as ritual site; ties to Mossad/CIA "honeytrap." Links to NWO via elite blackmail for global agenda.</p>
+    </div>
+
+    <div class="counter">
+        <h3>Counter</h3>
+        <p>Associations ≠ crimes. Trump/Clinton/Gates named but no charges. Death conspiracies (Clinton hit, etc.) debunked by autopsy/pathology.</p>
+    </div>
+
+    <div class="study-resources">
+        <strong>Study resources:</strong> Court docs on DocumentCloud/CourtListener; "Filthy Rich" (Netflix doc + book); Ghislaine Maxwell trial transcripts.
+    </div>
+
+    <!-- 2. Pizzagate -->
+    <h2>2. Pizzagate</h2>
+    <div class="baseline">
+        <h3>Baseline facts</h3>
+        <p>2016 WikiLeaks Podesta emails → 4chan/Reddit claims "pizza" = code for pedophilia; Comet Ping Pong basement as Democrat child-trafficking hub (no basement exists). Edgar Welch shot up the pizzeria in 2016; zero evidence found.</p>
+    </div>
+    <div class="conspiracy">
+        <h3>Conspiracy layer</h3>
+        <p>Epstein "proof" of elite pedo-ring; ties to occult Democrats (old elite) vs. Trump draining the swamp (new meritocrats). Evolves into QAnon/NWO child-harvesting for adrenochrome/control.</p>
+    </div>
+    <div class="counter">
+        <h3>Counter</h3>
+        <p>Pure hoax; no victims, no tunnels, no arrests beyond Welch. Debunked by NYT, BBC, Snopes, FBI.</p>
+    </div>
+    <div class="study-resources">
+        <strong>Study:</strong> WikiLeaks Podesta emails archive; "Pizzagate" Wikipedia; Edgar Welch NPR interview.
+    </div>
+
+    <!-- 3. Occultism & Occultic Practices -->
+    <h2>3. Occultism & Occultic Practices (Baal, Moloch)</h2>
+    <div class="baseline">
+        <h3>Baseline facts</h3>
+        <p>Bohemian Grove (est. 1872) hosts elites (Reagan, Bushes, Kissinger, tech CEOs) for "Cremation of Care" ritual — effigy burned before 40-ft owl statue (sometimes called Moloch). Alex Jones infiltrated 2000, filmed it.</p>
+    </div>
+    <div class="conspiracy">
+        <h3>Conspiracy layer</h3>
+        <p>Elite worship of Canaanite gods (Baal child sacrifice, Moloch); Grove as NWO planning site for wars, resets. Ties to new elites (Gates, Musk named in broader networks) continuing old bloodline rituals for power.</p>
+    </div>
+    <div class="counter">
+        <h3>Counter</h3>
+        <p>Private men's club "weird frat party" per members (Clint Eastwood, etc.). Ritual is theatrical "banishing worries." No proven sacrifices; owl = Bohemian Club symbol.</p>
+    </div>
+    <div class="study-resources">
+        <strong>Study:</strong> Alex Jones "Dark Secrets Inside Bohemian Grove" (2000 footage); "Bohemian Grove" Wikipedia; Jon Ronson docs.
+    </div>
+
+    <!-- 4. Wars on the Middle East + 9/11 -->
+    <h2>4. Wars on the Middle East + 9/11 "Inside Job"</h2>
+    <div class="baseline">
+        <h3>Baseline facts</h3>
+        <p>9/11 Commission Report (2004): al-Qaeda hijackings; NIST: fires + impact caused collapses (no explosives). Iraq/Afghanistan: post-9/11, WMD intel failures. No Israeli/Mossad orchestration proven.</p>
+    </div>
+    <div class="conspiracy">
+        <h3>Conspiracy layer</h3>
+        <p>False flag for oil, Greater Israel, NWO (new elites profit via defense/tech). Building 7 "demolition"; Pentagon missile; "dancing Israelis." Ties to wars fragmenting region for elite control.</p>
+    </div>
+    <div class="counter">
+        <h3>Counter</h3>
+        <p>9/11 Commission + NIST + Popular Mechanics/PBS NOVA fully debunk controlled demolition. No foreknowledge trading spikes. Wars had mixed motives (oil, hegemony, neocons).</p>
+    </div>
+    <div class="study-resources">
+        <strong>Study:</strong> 9/11 Commission Report; NIST WTC reports; "Debunking 9/11 Myths" (Popular Mechanics).
+    </div>
+
+    <!-- 5. Crypto -->
+    <h2>5. Crypto & Central Bank Digital Currencies</h2>
+    <div class="baseline">
+        <h3>Baseline facts</h3>
+        <p>Bitcoin (2009) decentralized; now institutions hold it. CBDCs in development (China e-CNY live; 130+ countries exploring). Trump 2025 Bitcoin reserve executive order.</p>
+    </div>
+    <div class="conspiracy">
+        <h3>Conspiracy layer</h3>
+        <p>Crypto as NWO trap — new elites (Gates, Musk, Thiel) push it then pivot to programmable CBDCs for "own nothing" enslavement. Or freedom tool against old banks.</p>
+    </div>
+    <div class="counter">
+        <h3>Counter</h3>
+        <p>Crypto volatile/speculative; CBDCs aim for efficiency/privacy trade-offs (programmability fears real but not automatic slavery). No proven "enslavement" rollout.</p>
+    </div>
+    <div class="study-resources">
+        <strong>Study:</strong> CFR "Crypto Question"; Atlantic Council CBDC tracker; Satoshi whitepaper.
+    </div>
+
+    <!-- 6. The Great Reset -->
+    <h2>6. The Great Reset ("Own Nothing")</h2>
+    <div class="baseline">
+        <h3>Baseline facts</h3>
+        <p>2016 WEF essay by Ida Auken: "Welcome to 2030... you'll own nothing and be happy" (subscription/rental economy prediction). Great Reset (2020 Schwab) = stakeholder capitalism post-COVID.</p>
+    </div>
+    <div class="conspiracy">
+        <h3>Conspiracy layer</h3>
+        <p>WEF/UN Agenda 2030 code for serfdom via CBDCs, digital IDs, climate lockdowns. New elites (Gates, Schwab, Kushner-style disruptors) enforce it.</p>
+    </div>
+    <div class="counter">
+        <h3>Counter</h3>
+        <p>Essay speculative futurism, not policy. WEF has no enforcement power. Phrase twisted; actual focus sustainability/inequality.</p>
+    </div>
+    <div class="study-resources">
+        <strong>Study:</strong> WEF.org original essay; Schwab "Great Reset" book; critiques (Cato, Alex Jones).
+    </div>
+
+    <!-- 7. Industrial Revolution -->
+    <h2>7. Industrial Revolution & Its Consequences</h2>
+    <div class="baseline">
+        <h3>Baseline facts</h3>
+        <p>1760–1840+ mechanization → urbanization, productivity explosion, longer lifespans. Modern tech continuation with AI acceleration.</p>
+    </div>
+    <div class="conspiracy">
+        <h3>Conspiracy layer</h3>
+        <p>Ted Kaczynski "Industrial Society and Its Future" (1995): tech system destroys autonomy, creates control state (NWO endgame). New meritocrats accelerate it toward singularity enslavement.</p>
+    </div>
+    <div class="counter">
+        <h3>Counter</h3>
+        <p>Massive poverty reduction, medicine, mobility gains. Inequality side-effects real but not "disaster only."</p>
+    </div>
+    <div class="study-resources">
+        <strong>Study:</strong> Full Unabomber Manifesto (editions-hache.com or archives); "The Rise of the Meritocracy" (Michael Young, 1959).
+    </div>
+
+    <!-- 8. Greater Israel -->
+    <h2>8. Israel, Zionism, Greater Israel Project</h2>
+    <div class="baseline">
+        <h3>Baseline facts</h3>
+        <p>Zionism = Jewish national movement (Herzl 1896). Modern Israel 1948 borders. Oded Yinon 1982 essay: strategic fragmentation of Arab states for Israeli security (not official policy).</p>
+    </div>
+    <div class="conspiracy">
+        <h3>Conspiracy layer</h3>
+        <p>Greater Israel as NWO expansion (new elites like Kushner advancing via Abraham Accords/wars). Ties to 9/11, Middle East chaos for control. Third Temple as prophecy/control mechanism.</p>
+    </div>
+    <div class="counter">
+        <h3>Counter</h3>
+        <p>No Israeli government pursues literal Greater Israel; current borders defensive. Yinon opinion piece. Claims often veer antisemitic (Protocols-style).</p>
+    </div>
+    <div class="study-resources">
+        <strong>Study:</strong> Herzl diaries; Yinon Plan English translation; Britannica/ADL on Zionism; contextualize bias carefully.
+    </div>
+
+    <!-- 9. Eschatology -->
+    <h2>9. Eschatological End Times (The Religious Overlay)</h2>
+    <p>Religious prophecy frameworks sometimes overlaid on NWO conspiracies (elites fulfilling/manipulating prophecy for control).</p>
+
+    <h3>Jewish Moshiach</h3>
+    <p>"End of days" (Acharit ha-Yamim) — ingathering exiles, Messiah rebuilds Third Temple, global peace. Some Religious Zionists see modern Israel as redemptive.</p>
+
+    <h3>Christian Rapture & Antichrist</h3>
+    <p>Premillennial: Rapture (pre-trib common), 7-year Tribulation, Antichrist, Armageddon, Second Coming, 1,000-year Millennium. Some see Israel restoration + Temple as prophetic clock; elites as Beast system.</p>
+
+    <h3>Islamic Mahdi & Dajjal</h3>
+    <p>Mahdi (righteous leader), Dajjal (one-eyed Antichrist deceiver), Isa (Jesus) returns to kill Dajjal, Day of Judgment. Some link Palestine/Jerusalem to end signs; Dajjal as deceptive global system.</p>
+
+    <div class="conspiracy">
+        <h3>NWO Eschatological Tie-in</h3>
+        <p>New elites engineer chaos (wars, tech, finance) to fulfill (or fake) these prophecies — Third Temple for control, CBDCs as Mark of Beast, Greater Israel as biblical mandate cover. Technocratic meritocrats replacing old bloodlines while accelerating end-times script for depopulation/NWO.</p>
+    </div>
+
+    <div class="study-resources">
+        <strong>Study:</strong> Tanakh/Talmud (Jewish); Revelation + Daniel (Christian); Hadith collections (Muslim). Compare via Wikipedia eschatology; avoid fringe syntheses initially.
+    </div>
+
+    <hr>
+
+    <p style="font-size: 1.1rem;"><strong>Overall NWO Thesis:</strong> Surface = "global cooperation." Deep = technocratic new elite (Gates/Musk/Kushner/Trump orbit) using real tools (Epstein networks, WEF rhetoric, crypto, Israel strategy, prophecy language) to replace old guard and impose control. Real power concentration exists (tech billionaires, Davos); grand unified conspiracy lacks proof. Cross-check with primary docs, not echo chambers.</p>
+
+    <footer>
+        essay compiled · 2026 · sources linked where possible<br>
+        <span style="font-family: monospace;">⚡ the iceberg is deep ⚡</span>
+    </footer>
+</div>
+
+<script>
+    (function() {
+        // Draw Iceberg (canvas)
+        function drawIceberg() {
+            const canvas = document.getElementById('icebergCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#FFCC00';
+            ctx.lineWidth = 12;
+            ctx.beginPath();
+            ctx.moveTo(100, 280);
+            ctx.lineTo(400, 30);
+            ctx.lineTo(700, 280);
+            ctx.stroke();
+            
+            // melting drips
+            ctx.fillStyle = 'rgba(255,51,0,0.4)';
+            for(let i=0;i<8;i++) {
+                ctx.fillRect(200+Math.random()*400, 40+Math.random()*80, 8, 120);
+            }
+        }
+
+        // Draw Pyramid (canvas)
+        function drawPyramid() {
+            const canvas = document.getElementById('pyramidCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#FF3300';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(300, 50);
+            ctx.lineTo(550, 250);
+            ctx.lineTo(50, 250);
+            ctx.closePath();
+            ctx.stroke();
+            
+            ctx.fillStyle = '#996633';
+            ctx.beginPath();
+            ctx.arc(300, 140, 30, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(300, 140, 15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            for (let i = 0; i < 5; i++) {
+                ctx.strokeStyle = `hsl(${Math.random() * 30}, 100%, 50%)`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+                ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+                ctx.stroke();
+            }
+        }
+
+        // Draw Goat
+        function drawGoat() {
+            const canvas = document.getElementById('goatCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#FF3300';
+            ctx.font = '14px Courier New';
+            ctx.textAlign = 'left';
+            
+            const goatASCII = `   /\\_/\\
+  ( o.o )
+   > ^ <
+  /|   |\\
+ (_|   |_)`;
+            
+            ctx.fillText(goatASCII, 50, 50);
+            
+            ctx.strokeStyle = 'rgba(255, 51, 0, 0.3)';
+            ctx.lineWidth = 2;
+            drawPentagram(ctx, 200, 120, 60);
+        }
+
+        // Pentagram drawing utility
+        function drawPentagram(ctx, x, y, size) {
+            const points = [];
+            for (let i = 0; i < 5; i++) {
+                const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+                points.push([x + Math.cos(angle) * size, y + Math.sin(angle) * size]);
+            }
+            ctx.beginPath();
+            ctx.moveTo(points[0][0], points[0][1]);
+            ctx.lineTo(points[2][0], points[2][1]);
+            ctx.lineTo(points[4][0], points[4][1]);
+            ctx.lineTo(points[1][0], points[1][1]);
+            ctx.lineTo(points[3][0], points[3][1]);
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        // Draw glitch effect
+        function drawGlitch() {
+            const canvas = document.getElementById('glitchCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#FF3300';
+            ctx.font = 'bold 12px Courier New';
+            
+            const text = '[ !! FREQUENCY DETECTED !! ]';
+            ctx.fillText(text, 50, 30);
+            
+            for (let i = 0; i < 10; i++) {
+                ctx.fillStyle = `hsl(${Math.random() * 30}, 100%, 50%)`;
+                const y = Math.random() * canvas.height;
+                const h = Math.random() * 3 + 1;
+                ctx.fillRect(0, y, canvas.width, h);
+            }
+            
+            ctx.strokeStyle = '#FF3300';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let x = 0; x < canvas.width; x += 5) {
+                const y = 75 + Math.sin(x * 0.02) * 20;
+                ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+
+        // Initialize all drawings
+        drawIceberg();
+        drawPyramid();
+        drawGoat();
+        drawGlitch();
+
+        // Scroll interactions
+        const sections = document.querySelectorAll('.schizo-section');
+
+        let lastScrollY = window.scrollY;
+        let scrollDirection = 0;
+
+        window.addEventListener('scroll', function() {
+            const scrolled = window.scrollY;
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrolled / maxScroll) * 100;
+
+            // Update progress bar
+            document.getElementById('progressBar').style.width = scrollPercent + '%';
+
+            scrollDirection = scrolled > lastScrollY ? 1 : -1;
+            lastScrollY = scrolled;
+
+            document.querySelectorAll('h2').forEach(h2 => {
+                const hue = (scrollPercent * 1.2) % 30;
+                h2.style.color = `hsl(${hue}, 100%, 50%)`;
+            });
+
+            // Deeper = more glitch
+            if (scrollPercent > 60) {
+                document.body.style.filter = `hue-rotate(${Math.random()*15}deg)`;
+            }
+        });
+
+        // Occasional glitch
+        setInterval(() => {
+            const glitchVal = Math.random() * 3;
+            document.body.style.filter = `hue-rotate(${glitchVal}deg)`;
+            setTimeout(() => {
+                document.body.style.filter = '';
+            }, 150);
+        }, 5000);
+
+        // Handle audio autoplay
+        const audio = document.getElementById('backgroundAudio');
+        
+        // Log audio element state
+        console.log('Audio element:', audio);
+        console.log('Audio src:', audio.src);
+        
+        // Try to play on page load with muted state
+        const playAudio = () => {
+            console.log('Attempting to play audio from 15:21...');
+            audio.muted = false;
+            audio.volume = 0.5;
+            // Start from 15:21 minutes (921 seconds)
+            audio.currentTime = 921;
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        console.log('Audio playing successfully from 15:21');
+                    })
+                    .catch(error => {
+                        console.error('Audio playback error:', error);
+                    });
+            }
+        };
+
+        // Play on first user interaction
+        document.addEventListener('click', playAudio, { once: true });
+        window.addEventListener('scroll', playAudio, { once: true });
+        document.addEventListener('keydown', playAudio, { once: true });
+        document.addEventListener('touchstart', playAudio, { once: true });
+
+        console.log(">> SYSTEM INITIALIZED");
+    })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Field Flow Topology</title>
+<style>
+body{margin:0;background:#000;overflow:hidden}
+canvas{display:block}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<script>
+
+const canvas = document.getElementById("c")
+const ctx = canvas.getContext("2d")
+
+let W,H
+function resize(){
+ W=canvas.width=window.innerWidth
+ H=canvas.height=window.innerHeight
+}
+window.onresize=resize
+resize()
+
+/* PARAMETERS */
+
+const PARTICLES = 80000
+const SOURCES = 4
+const BOX = 350
+const EPS = 200
+const STEP = 0.6
+const JITTER = 0.3
+
+let time = 0
+let angleX = 0.6
+let angleY = 0.3
+let scale = 1
+
+/* PARTICLES */
+
+const p = new Float32Array(PARTICLES*3)
+
+/* SOURCES */
+
+const sx = new Float32Array(SOURCES)
+const sy = new Float32Array(SOURCES)
+const sz = new Float32Array(SOURCES)
+const sq = new Float32Array(SOURCES)
+const seed = new Float32Array(SOURCES)
+
+for(let i=0;i<SOURCES;i++){
+ seed[i]=Math.random()*10
+}
+
+/* INIT PARTICLES */
+
+for(let i=0;i<PARTICLES*3;i++){
+ p[i]=(Math.random()-0.5)*BOX
+}
+
+/* SOURCE MOTION */
+
+function updateSources(){
+
+ for(let i=0;i<SOURCES;i++){
+
+  const t=time+seed[i]
+
+  sx[i]=Math.sin(t*0.6)*160
+  sy[i]=Math.cos(t*0.4)*160
+  sz[i]=Math.sin(t*0.3)*160
+
+  sq[i]=2000*Math.sin(t*1.4)
+ }
+
+}
+
+/* FIELD GRADIENT */
+
+function gradient(x,y,z){
+
+ let gx=0,gy=0,gz=0
+
+ for(let i=0;i<SOURCES;i++){
+
+  let dx=x-sx[i]
+  let dy=y-sy[i]
+  let dz=z-sz[i]
+
+  let r2=dx*dx+dy*dy+dz*dz+EPS
+  let f=sq[i]/(r2*r2)
+
+  gx-=dx*f
+  gy-=dy*f
+  gz-=dz*f
+ }
+
+ return [gx,gy,gz]
+}
+
+/* PROJECTION */
+
+function project(x,y,z){
+
+ let x1=x*Math.cos(angleY)+z*Math.sin(angleY)
+ let z1=z*Math.cos(angleY)-x*Math.sin(angleY)
+
+ let y1=y*Math.cos(angleX)-z1*Math.sin(angleX)
+ let z2=z1*Math.cos(angleX)+y*Math.sin(angleX)
+
+ let f=(900*scale)/(900+z2)
+
+ return [
+  x1*f+W/2,
+  y1*f+H/2,
+  z2
+ ]
+}
+
+/* MAIN LOOP */
+
+function step(){
+
+ time+=0.01
+
+ ctx.fillStyle="rgba(0,0,0,0.035)"
+ ctx.fillRect(0,0,W,H)
+
+ updateSources()
+
+ for(let i=0;i<PARTICLES;i++){
+
+  let id=i*3
+
+  let x=p[id]
+  let y=p[id+1]
+  let z=p[id+2]
+
+  let g=gradient(x,y,z)
+
+  /* normalize gradient */
+
+  let m=Math.hypot(g[0],g[1],g[2])+0.0001
+
+  x+=STEP*g[0]/m
+  y+=STEP*g[1]/m
+  z+=STEP*g[2]/m
+
+  /* stochastic jitter */
+
+  x+=(Math.random()-0.5)*JITTER
+  y+=(Math.random()-0.5)*JITTER
+  z+=(Math.random()-0.5)*JITTER
+
+  /* boundary reset */
+
+  if(Math.abs(x)>BOX||Math.abs(y)>BOX||Math.abs(z)>BOX){
+
+   x=(Math.random()-0.5)*BOX
+   y=(Math.random()-0.5)*BOX
+   z=(Math.random()-0.5)*BOX
+
+  }
+
+  p[id]=x
+  p[id+1]=y
+  p[id+2]=z
+
+  let pr=project(x,y,z)
+
+  /* color from velocity magnitude */
+
+  let v=m*40
+
+  if(v>1) v=1
+
+  ctx.fillStyle=`rgba(${255*v},${255*(1-v)},255,0.6)`
+
+  ctx.fillRect(pr[0],pr[1],1,1)
+
+ }
+
+ requestAnimationFrame(step)
+
+}
+
+/* INTERACTION */
+
+let dragging=false
+let lx,ly
+
+canvas.onmousedown=e=>{
+ dragging=true
+ lx=e.clientX
+ ly=e.clientY
+}
+
+window.onmouseup=()=>dragging=false
+
+window.onmousemove=e=>{
+ if(!dragging)return
+ angleY+=(e.clientX-lx)*0.005
+ angleX-=(e.clientY-ly)*0.005
+ lx=e.clientX
+ ly=e.clientY
+}
+
+window.onwheel=e=>{
+ scale=Math.max(0.2,Math.min(3,scale-e.deltaY*0.001))
+ e.preventDefault()
+}
+
+step()
+
+</script>
+</body>
+</html>
