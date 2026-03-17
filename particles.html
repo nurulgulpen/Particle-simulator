@@ -16,57 +16,63 @@
             align-items: center;
             height: 100vh;
         }
-        canvas {
-            display: block;
-            cursor: move;
-        }
+        canvas { display: block; cursor: move; }
         #formula-overlay {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            pointer-events: none;
-            font-size: 12px;
-            color: #444;
-            line-height: 1.4;
+            position: absolute; top: 20px; left: 20px;
+            pointer-events: none; font-size: 12px; color: #444; line-height: 1.4;
+        }
+        #zoom-hint {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            font-size: 11px; color: #333; pointer-events: none; transition: opacity 0.3s;
         }
     </style>
 </head>
 <body>
-
     <div id="formula-overlay">
         v = ∇Σ [ q_i / (|P - S_i|² + ε) ]<br>
-        PARTICLES: 60,000 | DECAY: 0.04<br>
+        PARTICLES: 100,000 | DECAY: 0.04<br>
         DYNAMICS: GRADIENT_FOLLOW_INTEGRATION
     </div>
-
+    <div id="zoom-hint">Zoom deeper to reveal the code...</div>
     <canvas id="quantumCanvas"></canvas>
-
-    <!-- Hidden background audio - Sleep Has Her House Soundtrack -->
     <audio id="backgroundAudio" loop preload="auto" style="display:none;">
         <source src="./Sleep Has Her House (Original Motion Picture Soundtrack) [P8umwTHWlyc].mp3" type="audio/mpeg">
     </audio>
 
     <script>
         /**
-         * DYNAMICAL FIELD TOPOLOGY
-         * Particles follow the gradient of the potential field.
-         * Minimalist Egan-style rendering: 1px points + long decay.
+         * ORGANIC QUANTUM FIELD - BINARY REVEAL
+         * Original physics + organism pulse + 0/1 reveal on deep zoom
          */
         const canvas = document.getElementById('quantumCanvas');
         const ctx = canvas.getContext('2d');
 
         let width, height;
-        let angleX = 0.5, angleY = 0.4, scale = 1.0, time = 0;
+        let angleX = 0.5, angleY = 0.4, scale = 0.01, time = 0;
         
         const BOX_SIZE = 1000;
         const NUM_PARTICLES = 100000;
         const SOURCES_COUNT = 5;
-        const EPSILON = 500; 
+        const EPSILON = 500;
+        
+        // Organism parameters
+        const HEARTBEAT_FREQ = 0.08;      // Slow pulse rhythm
+        const HEARTBEAT_STRENGTH = 0.15;  // Subtle breathing motion
+        const BINARY_REVEAL_START = 15;   // Scale where binary starts fading in
+        const BINARY_REVEAL_FULL = 35;    // Scale where binary is fully visible
 
         let sources = [];
         let particles = new Float32Array(NUM_PARTICLES * 3);
+        let particleBinary = new Uint8Array(NUM_PARTICLES); // Pre-assign 0/1 to each particle
         let isDragging = false;
         let lastMouseX, lastMouseY;
+        let stormIntensity = 0;
+        let stormDecay = 0.96;
+
+        // Pre-assign binary values (deterministic based on index)
+        for (let i = 0; i < NUM_PARTICLES; i++) {
+            particleBinary[i] = (Math.sin(i * 12.9898 + 78.233) * 43758.5453) % 2 > 0.5 ? 1 : 0;
+        }
 
         class Source {
             constructor() {
@@ -78,35 +84,44 @@
                 this.x = 0; this.y = 0; this.z = 0;
             }
             update(t) {
-                this.x = Math.sin(t * this.freqX + this.seed) * 150;
-                this.y = Math.cos(t * this.freqY + this.seed) * 150;
-                this.z = Math.sin(t * this.freqZ + this.seed) * 150;
-                this.q = this.qBase * (0.5 + 0.5 * Math.sin(t * 2 + this.seed));
+                // Add organism pulse to source motion
+                const pulse = Math.sin(t * HEARTBEAT_FREQ) * HEARTBEAT_STRENGTH;
+                this.x = Math.sin(t * this.freqX + this.seed) * 150 + pulse * 20;
+                this.y = Math.cos(t * this.freqY + this.seed) * 150 + pulse * 20;
+                this.z = Math.sin(t * this.freqZ + this.seed) * 150 + pulse * 20;
+                this.q = this.qBase * (0.5 + 0.5 * Math.sin(t * 2 + this.seed) + pulse * 0.3);
             }
         }
 
         function initParticles() {
-            for (let i = 0; i < NUM_PARTICLES * 3; i++) {
-                particles[i] = (Math.random() - 0.5) * BOX_SIZE;
+            const radius = BOX_SIZE / 2;
+            for (let i = 0; i < NUM_PARTICLES; i++) {
+                let idx = i * 3;
+                const u = Math.random(), v = Math.random(), w = Math.random();
+                const theta = 2 * Math.PI * u;
+                const phi = Math.acos(2 * v - 1);
+                const r = radius * Math.cbrt(w);
+                particles[idx] = r * Math.sin(phi) * Math.cos(theta);
+                particles[idx + 1] = r * Math.sin(phi) * Math.sin(theta);
+                particles[idx + 2] = r * Math.cos(phi);
             }
         }
 
-        // Calculate the gradient vector ∇ϕ at point (x,y,z)
         function getGradient(px, py, pz) {
             let vx = 0, vy = 0, vz = 0;
             for (let s of sources) {
-                let dx = px - s.x;
-                let dy = py - s.y;
-                let dz = pz - s.z;
+                let dx = px - s.x, dy = py - s.y, dz = pz - s.z;
                 let r2 = dx*dx + dy*dy + dz*dz + EPSILON;
-                
-                // ∇(q/r²) = -2q * r / r^4
                 let invR4 = s.q / (r2 * r2);
-                vx -= dx * invR4;
-                vy -= dy * invR4;
-                vz -= dz * invR4;
+                vx -= dx * invR4; vy -= dy * invR4; vz -= dz * invR4;
             }
-            return { x: vx * 10, y: vy * 10, z: vz * 10 };
+            // Add subtle organism pulse to gradient
+            const pulse = Math.sin(time * HEARTBEAT_FREQ) * HEARTBEAT_STRENGTH * 0.5;
+            return { 
+                x: vx * 10 + pulse * (Math.random() - 0.5), 
+                y: vy * 10 + pulse * (Math.random() - 0.5), 
+                z: vz * 10 + pulse * (Math.random() - 0.5) 
+            };
         }
 
         function project(x, y, z) {
@@ -131,58 +146,81 @@
 
         function animate() {
             time += 0.01;
-            
-            // Slow zoom in effect
             scale += 0.002;
             
-            // Temporal persistence - very low decay for structure buildup
+            // Update zoom hint visibility
+            const hint = document.getElementById('zoom-hint');
+            hint.style.opacity = scale < 10 ? '1' : '0';
+            
             ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
             ctx.fillRect(0, 0, width, height);
-
             sources.forEach(s => s.update(time));
 
-            // Set drawing style once
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            // Calculate binary reveal factor (0 = dots, 1 = full binary)
+            const binaryFactor = Math.max(0, Math.min(1, (scale - BINARY_REVEAL_START) / (BINARY_REVEAL_FULL - BINARY_REVEAL_START)));
 
             for (let i = 0; i < NUM_PARTICLES; i++) {
                 let idx = i * 3;
-                let px = particles[idx];
-                let py = particles[idx+1];
-                let pz = particles[idx+2];
+                let px = particles[idx], py = particles[idx+1], pz = particles[idx+2];
 
-                // Integrate position based on field gradient
                 let g = getGradient(px, py, pz);
                 particles[idx]   += g.x;
                 particles[idx+1] += g.y;
                 particles[idx+2] += g.z;
 
-                // Brownian/Quantum jitter to prevent collapse into single points
-                particles[idx]   += (Math.random() - 0.5) * 1.5;
-                particles[idx+1] += (Math.random() - 0.5) * 1.5;
-                particles[idx+2] += (Math.random() - 0.5) * 1.5;
+                // Add subtle organism jitter (coherent, not random)
+                const organismJitter = Math.sin(time * 0.3 + i * 0.01) * 0.2;
+                particles[idx]   += (Math.random() - 0.5) * 1.5 + organismJitter;
+                particles[idx+1] += (Math.random() - 0.5) * 1.5 + organismJitter;
+                particles[idx+2] += (Math.random() - 0.5) * 1.5 + organismJitter;
 
-                // Projection
                 let proj = project(px, py, pz);
 
-                // Boundary check or life cycle
                 if (Math.random() > 0.999) {
                     particles[idx] = (Math.random() - 0.5) * BOX_SIZE;
                     particles[idx+1] = (Math.random() - 0.5) * BOX_SIZE;
                     particles[idx+2] = (Math.random() - 0.5) * BOX_SIZE;
                 } else {
-                    // Selective color based on velocity or field
+                    // Original color logic preserved
                     if (i % 20 === 0) {
                         ctx.fillStyle = g.x > 0 ? 'rgba(0, 255, 255, 0.6)' : 'rgba(255, 0, 255, 0.6)';
                     } else {
                         ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
                     }
-                    ctx.fillRect(proj.x, proj.y, 1, 1);
+
+                    // 🔢 Binary reveal: fade from dots to 0/1 characters
+                    if (binaryFactor > 0.01) {
+                        // Fade out the dot
+                        const dotAlpha = 1 - binaryFactor;
+                        if (dotAlpha > 0.05) {
+                            ctx.fillStyle = `rgba(255, 255, 255, ${0.3 * dotAlpha})`;
+                            ctx.fillRect(proj.x, proj.y, 1, 1);
+                        }
+                        
+                        // Fade in the binary character
+                        if (binaryFactor > 0.1) {
+                            const char = particleBinary[i];
+                            const charAlpha = Math.min(1, binaryFactor * 1.2);
+                            
+                            // Only render every 3rd particle as text for performance
+                            if (i % 3 === 0) {
+                                ctx.fillStyle = `rgba(255, 255, 255, ${0.7 * charAlpha})`;
+                                ctx.font = `${Math.max(8, scale * 0.3)}px 'Courier New', monospace`;
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+                                ctx.fillText(char, proj.x, proj.y);
+                            }
+                        }
+                    } else {
+                        // Normal dot rendering
+                        ctx.fillRect(proj.x, proj.y, 1, 1);
+                    }
                 }
             }
-
             requestAnimationFrame(animate);
         }
 
+        // 🖱️ Controls
         window.addEventListener('mousedown', (e) => { isDragging = true; lastMouseX = e.clientX; lastMouseY = e.clientY; });
         window.addEventListener('mouseup', () => isDragging = false);
         window.addEventListener('mousemove', (e) => {
@@ -193,41 +231,18 @@
             }
         });
         window.addEventListener('wheel', (e) => {
-            scale = Math.max(0.1, Math.min(5.0, scale - e.deltaY * 0.001));
+            scale = Math.max(0.01, Math.min(80.0, scale - e.deltaY * 0.001));
             e.preventDefault();
         }, { passive: false });
 
-        // Handle audio autoplay
+        // Audio
         const audio = document.getElementById('backgroundAudio');
-        
-        // Log audio element state
-        console.log('Audio element:', audio);
-        console.log('Audio src:', audio.src);
-        
-        // Try to play on page load with muted state
-        const playAudio = () => {
-            console.log('Attempting to play audio...');
-            audio.volume = 0.5;
-            const playPromise = audio.play();
-            if (playPromise !== undefined) {
-                playPromise
-                    .then(() => {
-                        console.log('Audio playing successfully');
-                    })
-                    .catch(error => {
-                        console.error('Audio playback error:', error);
-                    });
-            }
-        };
+        const playAudio = () => { audio.volume = 0.5; audio.play().catch(() => {}); };
+        ['click','keydown','touchstart'].forEach(evt => 
+            document.addEventListener(evt, playAudio, { once: true })
+        );
 
-        // Play on first user interaction
-        document.addEventListener('click', playAudio, { once: true });
-        window.addEventListener('scroll', playAudio, { once: true });
-        document.addEventListener('keydown', playAudio, { once: true });
-        document.addEventListener('touchstart', playAudio, { once: true });
-
-        console.log(">> SYSTEM INITIALIZED");
-
+        console.log(">> ORGANIC BINARY SYSTEM INITIALIZED");
         animate();
     </script>
 </body>
